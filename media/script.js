@@ -1,4 +1,3 @@
-import Papa from 'https://cdn.jsdelivr.net/npm/papaparse/+esm';
 import { vector3Distance, matrixMul, createViewMatrix, createProjectionMatrix, projectPoint } from './math.js';
 
 const canvas = document.querySelector('canvas');
@@ -19,10 +18,12 @@ let distance = 50;
 let points = [];
 
 let lastCamera = '';
+let frame;
 function render() {
+  if (frame) cancelAnimationFrame(frame);
   let k = camera.position.join('-')+'_'+camera.rotation.join('-');
   if (lastCamera===k) {
-    requestAnimationFrame(render);
+    frame = requestAnimationFrame(render);
     return;
   }
   lastCamera = k;
@@ -50,30 +51,39 @@ function render() {
     ctx.fill();
   });
 
-  requestAnimationFrame(render);
+  frame = requestAnimationFrame(render);
 }
 
 document.getElementById('load').onclick = async()=>{
   const cache = await caches.open('cache');
   let response = await cache.match('galaxy');
   if (!response) {
-    response = await fetch('https://nontrinsic.linerly.xyz/api/v1/nonsense/galaxy');
+    response = await fetch('https://nontrinsic.linerly.xyz/api/v1/nonsense/galaxy?format=json');
     await cache.put('galaxy', response.clone());
   }
+  response = await response.json();
 
-  Papa.parse((await response.text()), {
-    header: true,
-    complete(results) {
-      results.data.forEach(pt=>{
-        points.push({
-          position: [parseFloat(pt.umap_dim_0)*2, parseFloat(pt.umap_dim_1)*2, parseFloat(pt.umap_dim_2)*2],
-          size: Math.abs(parseFloat(pt.point_size))*20,
-          color: '#'+pt.uuid.slice(-6)+'aa'
-        });
-      });
-      render();
-    }
+  let avg = [0, 0, 0];
+  let count = 0;
+  response.forEach(pt=>{
+    let x = pt.umap_dim_0*2;
+    let y = pt.umap_dim_1*2;
+    let z = pt.umap_dim_2*2;
+    let color = '#'+pt.uuid.slice(-6)+'88';
+    avg[0] += x;
+    avg[1] += y;
+    avg[2] += z;
+    count++;
+    points.push({
+      position: [x, y, z],
+      size: pt.point_size*20,
+      color
+    });
   });
+  center[0] = avg[0]/count;
+  center[1] = avg[1]/count;
+  center[2] = avg[2]/count;
+  render();
 };
 
 function updateCamera() {
