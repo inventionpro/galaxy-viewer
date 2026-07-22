@@ -99,12 +99,12 @@ document.addEventListener('pointerlockchange', ()=>{
 });
 
 const starColors = [
-  [255,181,110],
-  [255,211,155],
-  [255,244,232],
-  [248,248,255],
-  [202,216,255],
-  [168,200,255]
+  [191,135,82],
+  [191,158,116],
+  [191,183,174],
+  [186,186,191],
+  [151,162,191],
+  [126,150,191]
 ];
 const lerp = (a,b,t)=>Math.round(a+(b-a)*t);
 function uuidToColor(uuid) {
@@ -137,9 +137,9 @@ document.addEventListener('DOMContentLoaded',  async()=>{
   let avg = [0, 0, 0];
   let count = 0;
   response.forEach(pt=>{
-    let x = pt.umap_dim_0*2;
-    let y = pt.umap_dim_1*2;
-    let z = pt.umap_dim_2*2;
+    let x = pt.umap_dim_0*3;
+    let y = pt.umap_dim_1*3;
+    let z = pt.umap_dim_2*3;
     avg[0] += x;
     avg[1] += y;
     avg[2] += z;
