@@ -5,6 +5,7 @@ const ctx = canvas.getContext('2d');
 
 window.onresize = ()=>{
   canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
 };
 window.onresize();
 
@@ -26,7 +27,7 @@ let lastCamera = '';
 let frame;
 function render() {
   if (frame) cancelAnimationFrame(frame);
-  let k = camera.position.join('-')+'_'+camera.rotation.join('-')+'_'+canvas.width;
+  let k = [camera.position.join('-'), camera.rotation.join('-'), canvas.width, canvas.height].join('_');
   if (lastCamera===k) {
     frame = requestAnimationFrame(render);
     return;
@@ -59,7 +60,47 @@ function render() {
   frame = requestAnimationFrame(render);
 }
 
-document.getElementById('load').onclick = async()=>{
+function updateCamera() {
+  camera.position[0] = center[0] + distance*Math.cos(pitch)*Math.sin(yaw);
+  camera.position[1] = center[1] + distance*Math.sin(pitch);
+  camera.position[2] = center[2] + distance*Math.cos(pitch)*Math.cos(yaw);
+
+  let dx = center[0] - camera.position[0];
+  let dy = center[1] - camera.position[1];
+  let dz = center[2] - camera.position[2];
+
+  camera.rotation[0] = Math.atan2(dy,Math.hypot(dx,dz));
+  camera.rotation[1] = Math.atan2(dx,dz)+Math.PI;
+
+  console.log(camera)
+}
+function mouseIn(evt) {
+  yaw += evt.movementX*0.01;
+  pitch -= evt.movementY*0.01;
+  let lm = Math.PI/2 + 0.01;
+  pitch = Math.max(-lm, Math.min(lm, pitch));
+  updateCamera();
+}
+canvas.onwheel = (evt)=>{
+  distance += evt.deltaY/25;
+  updateCamera();
+};
+canvas.onclick = async()=>{
+  if (document.pointerLockElement===canvas) {
+    document.exitPointerLock()
+  } else {
+    await canvas.requestPointerLock();
+  }
+};
+document.addEventListener('pointerlockchange', ()=>{
+  if (document.pointerLockElement===canvas) {
+    document.addEventListener('mousemove', mouseIn);
+  } else {
+    document.removeEventListener('mousemove', mouseIn);
+  }
+});
+
+document.addEventListener('DOMContentLoaded',  async()=>{
   const cache = await caches.open('cache');
   let response = await cache.match('galaxy');
   if (!response) {
@@ -89,44 +130,4 @@ document.getElementById('load').onclick = async()=>{
   center[1] = avg[1]/count;
   center[2] = avg[2]/count;
   render();
-};
-
-function updateCamera() {
-  camera.position[0] = center[0] + distance*Math.cos(pitch)*Math.sin(yaw);
-  camera.position[1] = center[1] + distance*Math.sin(pitch);
-  camera.position[2] = center[2] + distance*Math.cos(pitch)*Math.cos(yaw);
-
-  let dx = center[0] - camera.position[0];
-  let dy = center[1] - camera.position[1];
-  let dz = center[2] - camera.position[2];
-
-  camera.rotation[0] = Math.atan2(dy,Math.hypot(dx,dz));
-  camera.rotation[1] =  Math.atan2(dx,dz);
-
-  console.log(camera)
-}
-function mouseIn(evt) {
-  yaw += evt.movementX*0.01;
-  pitch -= evt.movementY*0.01;
-  let lm = Math.PI/2 + 0.01;
-  pitch = Math.max(-lm, Math.min(lm, pitch));
-  updateCamera();
-}
-canvas.onwheel = (evt)=>{
-  distance += evt.deltaY/25;
-  updateCamera();
-};
-canvas.onclick = async()=>{
-  if (document.pointerLockElement===canvas) {
-    document.exitPointerLock()
-  } else {
-    await canvas.requestPointerLock();
-  }
-};
-document.addEventListener('pointerlockchange', ()=>{
-  if (document.pointerLockElement===canvas) {
-    document.addEventListener('mousemove', mouseIn);
-  } else {
-    document.removeEventListener('mousemove', mouseIn);
-  }
 });
