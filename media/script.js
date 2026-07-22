@@ -105,9 +105,9 @@ canvas.onkeydown = (evt)=>{
     spin = null;
   } else {
     spin = setInterval(()=>{
-      yaw -= 0.05;
+      yaw -= 0.005;
       updateCamera();
-    }, 100);
+    }, 10);
   }
 };
 
