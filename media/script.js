@@ -5,7 +5,7 @@ const canvas = document.querySelector('canvas');
 const ctx = canvas.getContext('2d');
 
 let camera = {
-  position: [0, 0, 10],
+  position: [0, 0, 100],
   rotation: [0, 0, 0],
   fov: Math.PI/3,
   nearPlane: 0.1,
@@ -45,9 +45,9 @@ document.getElementById('load').onclick = ()=>{
     complete(results) {
       results.data.forEach(pt=>{
         points.push({
-          position: [pt.umap_dim_0, pt.umap_dim_1, pt.umap_dim_2],
-          size: pt.point_size,
-          color: pt.uuid.slice(-6)
+          position: [parseFloat(pt.umap_dim_0), parseFloat(pt.umap_dim_1), parseFloat(pt.umap_dim_2)],
+          size: Math.abs(parseFloat(pt.point_size))*100,
+          color: '#'+pt.uuid.slice(-6)
         });
       });
       render();
