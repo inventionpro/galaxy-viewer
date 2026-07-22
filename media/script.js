@@ -95,14 +95,14 @@ function updateCamera() {
   let dy = center[1] - camera.position[1];
   let dz = center[2] - camera.position[2];
 
-  camera.rotation[0] = Math.atan2(dx,dz);
-  camera.rotation[1] = Math.atan2(dy,Math.hypot(dx,dz));
+  camera.rotation[0] = Math.atan2(dy,Math.hypot(dx,dz));
+  camera.rotation[1] =  Math.atan2(dx,dz);
 }
 function mouseIn(evt) {
-  pitch += evt.movementX*0.01;
-  yaw += evt.movementY*0.01;
+  yaw += evt.movementX*0.01;
+  pitch -= evt.movementY*0.01;
   let lm = Math.PI/2 + 0.01;
-  yaw = Math.max(-lm, Math.min(lm, yaw));
+  pitch = Math.max(-lm, Math.min(lm, pitch));
   updateCamera();
 }
 canvas.onwheel = (evt)=>{
