@@ -72,8 +72,8 @@ document.getElementById('load').onclick = async()=>{
 };
 
 function mouseIn(evt) {
-  camera.position[0] -= evt.movementX;
-  camera.position[1] -= evt.movementY;
+  camera.position[0] += evt.movementX/-2;
+  camera.position[1] += evt.movementY/2;
 }
 canvas.onwheel = (evt)=>{
   camera.position[2] += evt.deltaY/25;
