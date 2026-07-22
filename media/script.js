@@ -3,6 +3,11 @@ import { vector3Distance, matrixMul, createViewMatrix, createProjectionMatrix, p
 const canvas = document.querySelector('canvas');
 const ctx = canvas.getContext('2d');
 
+window.onresize = ()=>{
+  canvas.width = window.innerWidth;
+};
+window.onresize();
+
 let camera = {
   position: [0, 0, 50],
   rotation: [0, 0, 0],
@@ -21,7 +26,7 @@ let lastCamera = '';
 let frame;
 function render() {
   if (frame) cancelAnimationFrame(frame);
-  let k = camera.position.join('-')+'_'+camera.rotation.join('-');
+  let k = camera.position.join('-')+'_'+camera.rotation.join('-')+'_'+canvas.width;
   if (lastCamera===k) {
     frame = requestAnimationFrame(render);
     return;
@@ -97,6 +102,8 @@ function updateCamera() {
 
   camera.rotation[0] = Math.atan2(dy,Math.hypot(dx,dz));
   camera.rotation[1] =  Math.atan2(dx,dz);
+
+  console.log(camera)
 }
 function mouseIn(evt) {
   yaw += evt.movementX*0.01;
