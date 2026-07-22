@@ -13,7 +13,15 @@ let camera = {
 };
 let points = [];
 
+let lastCamera = '';
 function render() {
+  let k = camera.position.join('-')+'_'+camera.rotation.join('-');
+  if (lastCamera===k) {
+    requestAnimationFrame(render);
+    return;
+  }
+  lastCamera = k;
+
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   const view = createViewMatrix(camera.position, camera.rotation);
   const projection = createProjectionMatrix(camera.fov, canvas.width/canvas.height, camera.nearPlane, camera.farPlane);
@@ -33,9 +41,11 @@ function render() {
   projected.forEach(pt=>{
     ctx.fillStyle = pt.color;
     ctx.beginPath();
-    ctx.arc(pt.screen[0], pt.screen[1], pt.size, 0, Math.PI * 2);
+    ctx.arc(pt.screen[0], pt.screen[1], pt.size, 0, Math.PI*2);
     ctx.fill();
   });
+
+  requestAnimationFrame(render);
 }
 
 document.getElementById('load').onclick = async()=>{
@@ -52,8 +62,8 @@ document.getElementById('load').onclick = async()=>{
       results.data.forEach(pt=>{
         points.push({
           position: [parseFloat(pt.umap_dim_0)*2, parseFloat(pt.umap_dim_1)*2, parseFloat(pt.umap_dim_2)*2],
-          size: Math.abs(parseFloat(pt.point_size))*50,
-          color: '#'+pt.uuid.slice(-6)
+          size: Math.abs(parseFloat(pt.point_size))*20,
+          color: '#'+pt.uuid.slice(-6)+'aa'
         });
       });
       render();
@@ -64,13 +74,16 @@ document.getElementById('load').onclick = async()=>{
 function mouseIn(evt) {
   camera.position[0] -= evt.movementX;
   camera.position[1] -= evt.movementY;
-  render();
 }
 canvas.onwheel = (evt)=>{
   camera.position[2] += evt.deltaY/25;
 };
 canvas.onclick = async()=>{
-  await canvas.requestPointerLock();
+  if (document.pointerLockElement===canvas) {
+    document.exitPointerLock()
+  } else {
+    await canvas.requestPointerLock();
+  }
 };
 document.addEventListener('pointerlockchange', ()=>{
   if (document.pointerLockElement===canvas) {
