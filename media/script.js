@@ -99,15 +99,15 @@ document.addEventListener('pointerlockchange', ()=>{
 });
 
 const starColors = [
-  [191,135,82],
-  [191,158,116],
-  [191,183,174],
-  [186,186,191],
-  [151,162,191],
-  [126,150,191]
+  [255,181,110],
+  [255,211,155],
+  [255,244,232],
+  [248,248,255],
+  [202,216,255],
+  [168,200,255]
 ];
 const lerp = (a,b,t)=>Math.round(a+(b-a)*t);
-function uuidToColor(uuid) {
+function getColor(uuid, size) {
   let seed = 0;
   uuid
     .replaceAll('-','')
@@ -121,7 +121,7 @@ function uuidToColor(uuid) {
   let a = starColors[idx];
   let b = starColors[Math.min(idx+1,starColors.length-1)];
 
-  return `rgb(${lerp(a[0],b[0],step)},${lerp(a[1],b[1],step)},${lerp(a[2],b[2],step)})`;
+  return `rgba(${lerp(a[0],b[0],step)},${lerp(a[1],b[1],step)},${lerp(a[2],b[2],step)},${Math.round(Math.min(size/0.5*200,200))+55})`;
 }
 
 
@@ -147,7 +147,7 @@ document.addEventListener('DOMContentLoaded',  async()=>{
     points.push({
       position: [x, y, z],
       size: pt.point_size*20,
-      color: uuidToColor(pt.uuid)
+      color: getColor(pt.uuid, pt.point_size)
     });
   });
   center[0] = avg[0]/count;
