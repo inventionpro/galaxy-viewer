@@ -12,6 +12,8 @@ let camera = {
   farPlane: 1000
 };
 let center = [0, 0, 0];
+let yaw = 0;
+let pitch = 0;
 let distance = 50;
 
 let points = [];
@@ -75,15 +77,22 @@ document.getElementById('load').onclick = async()=>{
 };
 
 function updateCamera() {
-  camera.position[0] = center[0] + distance*Math.cos(camera.rotation[1])*Math.sin(camera.rotation[0]);
-  camera.position[1] = center[1] + distance*Math.sin(camera.rotation[1]);
-  camera.position[2] = center[2] + distance*Math.cos(camera.rotation[1])*Math.cos(camera.rotation[0]);
+  camera.position[0] = center[0] + distance*Math.cos(pitch)*Math.sin(yaw);
+  camera.position[1] = center[1] + distance*Math.sin(pitch);
+  camera.position[2] = center[2] + distance*Math.cos(pitch)*Math.cos(yaw);
+
+  let dx = center[0] - camera.position[0];
+  let dy = center[1] - camera.position[1];
+  let dz = center[2] - camera.position[2];
+
+  camera.rotation[0] = Math.atan2(dx,dz);
+  camera.rotation[1] = Math.atan2(dy,Math.hypot(dx,dz));
 }
 function mouseIn(evt) {
-  camera.rotation[0] += evt.movementX*0.01;
-  camera.rotation[1] += evt.movementY*0.01;
+  pitch += evt.movementX*0.01;
+  yaw += evt.movementY*0.01;
   let lm = Math.PI/2 + 0.01;
-  camera.rotation[1] = Math.max(-lm, Math.min(lm, camera.rotation[1]));
+  yaw = Math.max(-lm, Math.min(lm, yaw));
   updateCamera();
 }
 canvas.onwheel = (evt)=>{
