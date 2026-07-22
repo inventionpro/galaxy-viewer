@@ -47,7 +47,6 @@ document.getElementById('load').onclick = async()=>{
   }
 
   Papa.parse((await response.text()), {
-    download: true,
     header: true,
     complete(results) {
       results.data.forEach(pt=>{
