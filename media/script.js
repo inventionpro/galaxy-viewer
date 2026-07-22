@@ -75,13 +75,13 @@ document.getElementById('load').onclick = async()=>{
 };
 
 function updateCamera() {
-  camera.position[0] = center[0] + distance*Math.cos(camera.position[1])*Math.sin(-camera.position[0]);
+  camera.position[0] = center[0] + distance*Math.cos(camera.position[1])*Math.sin(camera.position[0]);
   camera.position[1] = center[1] + distance*Math.sin(camera.position[1]);
-  camera.position[2] = center[2] + distance*Math.cos(camera.position[1])*Math.cos(-camera.position[0]);
+  camera.position[2] = center[2] + distance*Math.cos(camera.position[1])*Math.cos(camera.position[0]);
 }
 function mouseIn(evt) {
-  camera.position[0] -= evt.movementX*0.1;
-  camera.position[1] += evt.movementY*0.1;
+  camera.position[0] += evt.movementX*0.01;
+  camera.position[1] += evt.movementY*0.01;
   let lm = Math.PI/2 + 0.01;
   camera.position[1] = Math.max(-lm, Math.min(lm, camera.position[1]));
   updateCamera();
