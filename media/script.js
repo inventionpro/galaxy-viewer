@@ -38,15 +38,22 @@ function render() {
   });
 }
 
-document.getElementById('load').onclick = ()=>{
-  Papa.parse('https://nontrinsic.linerly.xyz/api/v1/nonsense/galaxy', {
+document.getElementById('load').onclick = async()=>{
+  const cache = await caches.open('cache');
+  let response = await cache.match('galaxy');
+  if (!response) {
+    response = await fetch('https://nontrinsic.linerly.xyz/api/v1/nonsense/galaxy');
+    await cache.put('galaxy', response.clone());
+  }
+
+  Papa.parse((await response.text()), {
     download: true,
     header: true,
     complete(results) {
       results.data.forEach(pt=>{
         points.push({
           position: [parseFloat(pt.umap_dim_0), parseFloat(pt.umap_dim_1), parseFloat(pt.umap_dim_2)],
-          size: Math.abs(parseFloat(pt.point_size))*100,
+          size: Math.abs(parseFloat(pt.point_size))*50,
           color: '#'+pt.uuid.slice(-6)
         });
       });
@@ -54,3 +61,19 @@ document.getElementById('load').onclick = ()=>{
     }
   });
 };
+
+function mouseIn(evt) {
+  camera.position[0] += evt.movementX;
+  camera.position[1] += evt.movementY;
+  render();
+}
+canvas.onclick = async()=>{
+  await canvas.requestPointerLock();
+};
+document.addEventListener('pointerlockchange', ()=>{
+  if (document.pointerLockElement===canvas) {
+    document.addEventListener('mousemove', mouseIn);
+  } else {
+    document.removeEventListener('mousemove', mouseIn);
+  }
+});
