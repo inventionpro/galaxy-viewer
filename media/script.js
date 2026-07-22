@@ -71,12 +71,10 @@ function updateCamera() {
 
   camera.rotation[0] = Math.atan2(dy,Math.hypot(dx,dz));
   camera.rotation[1] = Math.atan2(dx,dz)+Math.PI;
-
-  console.log(camera)
 }
 function mouseIn(evt) {
-  yaw += evt.movementX*0.01;
-  pitch -= evt.movementY*0.01;
+  yaw -= evt.movementX*0.01;
+  pitch += evt.movementY*0.01;
   let lm = Math.PI/2 + 0.01;
   pitch = Math.max(-lm, Math.min(lm, pitch));
   updateCamera();
@@ -129,5 +127,6 @@ document.addEventListener('DOMContentLoaded',  async()=>{
   center[0] = avg[0]/count;
   center[1] = avg[1]/count;
   center[2] = avg[2]/count;
+  updateCamera();
   render();
 });
