@@ -98,6 +98,33 @@ document.addEventListener('pointerlockchange', ()=>{
   }
 });
 
+const starColors = [
+  [255,181,110],
+  [255,211,155],
+  [255,244,232],
+  [248,248,255],
+  [202,216,255],
+  [168,200,255]
+];
+const lerp = (a,b,t)=>Math.round(a+(b-a)*t);
+function uuidToColor(uuid) {
+  let seed = 0;
+  uuid
+    .replaceAll('-','')
+    .split('')
+    .map(c=>c.charCodeAt(0))
+    .forEach(c=>{seed=(seed*31+c)>>>0})
+  seed = ((seed/0xffffffff)**2)*(starColors.length-1);
+  let idx = Math.floor(seed);
+  let step = seed - idx;
+
+  let a = starColors[idx];
+  let b = starColors[Math.min(idx+1,starColors.length-1)];
+
+  return `rgb(${lerp(a[0],b[0],step)},${lerp(a[1],b[1],step)},${lerp(a[2],b[2],step)})`;
+}
+
+
 document.addEventListener('DOMContentLoaded',  async()=>{
   const cache = await caches.open('cache');
   let response = await cache.match('galaxy');
@@ -113,7 +140,6 @@ document.addEventListener('DOMContentLoaded',  async()=>{
     let x = pt.umap_dim_0*2;
     let y = pt.umap_dim_1*2;
     let z = pt.umap_dim_2*2;
-    let color = '#'+pt.uuid.slice(-6)+'88';
     avg[0] += x;
     avg[1] += y;
     avg[2] += z;
@@ -121,7 +147,7 @@ document.addEventListener('DOMContentLoaded',  async()=>{
     points.push({
       position: [x, y, z],
       size: pt.point_size*20,
-      color
+      color: uuidToColor(pt.uuid)
     });
   });
   center[0] = avg[0]/count;
