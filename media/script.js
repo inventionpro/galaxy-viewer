@@ -5,7 +5,7 @@ const canvas = document.querySelector('canvas');
 const ctx = canvas.getContext('2d');
 
 let camera = {
-  position: [0, 0, 100],
+  position: [0, 0, 50],
   rotation: [0, 0, 0],
   fov: Math.PI/3,
   nearPlane: 0.1,
@@ -51,7 +51,7 @@ document.getElementById('load').onclick = async()=>{
     complete(results) {
       results.data.forEach(pt=>{
         points.push({
-          position: [parseFloat(pt.umap_dim_0), parseFloat(pt.umap_dim_1), parseFloat(pt.umap_dim_2)],
+          position: [parseFloat(pt.umap_dim_0)*2, parseFloat(pt.umap_dim_1)*2, parseFloat(pt.umap_dim_2)*2],
           size: Math.abs(parseFloat(pt.point_size))*50,
           color: '#'+pt.uuid.slice(-6)
         });
@@ -62,10 +62,13 @@ document.getElementById('load').onclick = async()=>{
 };
 
 function mouseIn(evt) {
-  camera.position[0] += evt.movementX;
-  camera.position[1] += evt.movementY;
+  camera.position[0] -= evt.movementX;
+  camera.position[1] -= evt.movementY;
   render();
 }
+canvas.onwheel = (evt)=>{
+  camera.position[2] += evt.deltaY/25;
+};
 canvas.onclick = async()=>{
   await canvas.requestPointerLock();
 };
