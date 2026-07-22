@@ -99,12 +99,12 @@ document.addEventListener('pointerlockchange', ()=>{
 });
 
 const starColors = [
-  [255,181,110],
-  [255,211,155],
-  [255,244,232],
-  [248,248,255],
-  [202,216,255],
-  [168,200,255]
+  [215,145,80],
+  [220,175,120],
+  [220,210,190],
+  [215,220,230],
+  [165,185,225],
+  [130,160,225]
 ];
 const lerp = (a,b,t)=>Math.round(a+(b-a)*t);
 function getColor(uuid, size) {
@@ -121,7 +121,7 @@ function getColor(uuid, size) {
   let a = starColors[idx];
   let b = starColors[Math.min(idx+1,starColors.length-1)];
 
-  return `rgba(${lerp(a[0],b[0],step)},${lerp(a[1],b[1],step)},${lerp(a[2],b[2],step)},${Math.round(Math.min(size/0.5*200,200))+55})`;
+  return `rgba(${lerp(a[0],b[0],step)},${lerp(a[1],b[1],step)},${lerp(a[2],b[2],step)},${Math.min(size/0.6+0.2,1)})`;
 }
 
 
