@@ -1,1 +1,1 @@
-# galaxy-viewer
+# Galaxy Viewer
