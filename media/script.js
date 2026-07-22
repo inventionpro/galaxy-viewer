@@ -97,6 +97,18 @@ document.addEventListener('pointerlockchange', ()=>{
     document.removeEventListener('mousemove', mouseIn);
   }
 });
+let spin;
+canvas.onkeydown = (evt)=>{
+  if (evt.key!=='s') return;
+  if (spin) {
+    clearInterval(spin);
+  } else {
+    spin = setInterval(()=>{
+      yaw -= 0.1;
+      updateCamera();
+    }, 10);
+  }
+};
 
 const starColors = [
   [215,145,80],
