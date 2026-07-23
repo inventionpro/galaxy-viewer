@@ -80,7 +80,7 @@ function mouseIn(evt) {
   updateCamera();
 }
 canvas.onwheel = (evt)=>{
-  distance = Math.max(distance+(evt.deltaY/25), 0);
+  distance = Math.max(distance+(evt.deltaY/50), 2);
   updateCamera();
 };
 canvas.onclick = async()=>{
