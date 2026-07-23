@@ -1,5 +1,5 @@
 export function vector3Distance(A, B) {
-  return Math.sqrt((B[0]-A[0])**2 + (B[1]-A[1])**2 + (B[2]-A[2])**2);
+  return (B[0]-A[0])**2 + (B[1]-A[1])**2 + (B[2]-A[2])**2;
 }
 export function matrixMul(A, B) {
   const aIsVec = !Array.isArray(A[0]);
