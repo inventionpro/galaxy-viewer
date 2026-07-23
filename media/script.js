@@ -3,12 +3,6 @@ import { vector3Distance, matrixMul, createViewMatrix, createProjectionMatrix, p
 const canvas = document.querySelector('canvas');
 const ctx = canvas.getContext('2d');
 
-window.onresize = ()=>{
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-};
-window.onresize();
-
 let camera = {
   position: [0, 0, 50],
   rotation: [0, 0, 0],
@@ -16,39 +10,47 @@ let camera = {
   nearPlane: 0.1,
   farPlane: 1000
 };
+let cameraDirty = false;
+let projection;
 let center = [0, 0, 0];
 let yaw = 0;
 let pitch = 0;
 let distance = 50;
 
+window.onresize = ()=>{
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  projection = createProjectionMatrix(camera.fov, canvas.width/canvas.height, camera.nearPlane, camera.farPlane);
+  cameraDirty = true;
+};
+window.onresize();
+
 let points = [];
 
-let lastCamera = '';
 let frame;
 function render() {
   if (frame) cancelAnimationFrame(frame);
-  let k = [camera.position.join('-'), camera.rotation.join('-'), canvas.width, canvas.height].join('_');
-  if (lastCamera===k) {
+  if (!cameraDirty) {
     frame = requestAnimationFrame(render);
     return;
   }
-  lastCamera = k;
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   const view = createViewMatrix(camera.position, camera.rotation);
-  const projection = createProjectionMatrix(camera.fov, canvas.width/canvas.height, camera.nearPlane, camera.farPlane);
   const vp = matrixMul(projection, view);
 
-  let projected = points
-    .map(pt=>{
-      let screen = projectPoint(pt.position, vp, canvas.width, canvas.height);
-      if (!screen) return null;
-      pt.screen = screen;
-      pt.distance = vector3Distance(pt.position, camera.position);
-      return pt;
-    })
-    .filter(Boolean)
-    .toSorted((a,b)=>b.distance-a.distance);
+  let projected = [];
+  for (let i=0; i<points.length; i++) {
+    let pt = points[i];
+
+    let screen = projectPoint(pt.position, vp, canvas.width, canvas.height);
+    if (!screen) continue;
+
+    pt.screen = screen;
+    pt.distance = vector3Distance(pt.position, camera.position);
+    projected.push(pt);
+  }
+  projected.sort((a,b)=>b.distance-a.distance);
 
   projected.forEach(pt=>{
     ctx.fillStyle = pt.color;
@@ -71,6 +73,8 @@ function updateCamera() {
 
   camera.rotation[0] = Math.atan2(dy,Math.hypot(dx,dz));
   camera.rotation[1] = Math.atan2(dx,dz)+Math.PI;
+
+  cameraDirty = true;
 }
 function mouseIn(evt) {
   yaw -= evt.movementX*0.01;
