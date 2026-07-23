@@ -34,6 +34,7 @@ function render() {
     frame = requestAnimationFrame(render);
     return;
   }
+  cameraDirty = false;
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   const view = createViewMatrix(camera.position, camera.rotation);
